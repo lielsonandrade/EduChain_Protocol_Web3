@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu Protocol - Web3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+            width: 100%;
+        }
+
+        .btn-connect {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-connect:hover {
+            background: #5568d3;
+        }
+
+        .btn-connect.connected {
+            background: #48bb78;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .card input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #38a169;
+        }
+
+        .btn-tertiary {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-tertiary:hover:not(:disabled) {
+            background: #dd6b20;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .message {
+            background: #e6fffa;
+            border-left: 4px solid #48bb78;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            word-break: break-word;
+            font-size: 14px;
+        }
+
+        .message.error {
+            background: #fff5f5;
+            border-left-color: #f56565;
+            color: #c53030;
+        }
+
+        .message.success {
+            background: #e6fffa;
+            border-left-color: #48bb78;
+            color: #22543d;
+        }
+
+        .message.warning {
+            background: #fffaf0;
+            border-left-color: #ed8936;
+            color: #7c2d12;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            grid-column: 1 / -1;
+        }
+
+        .balance-card h2 {
+            color: white;
+        }
+
+        .balance-card p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .info-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .info-section p {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .network-info {
+            background: #e6fffa;
+            border-left: 4px solid #48bb78;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #22543d;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div>
+                <h1>🎓 Edu Protocol</h1>
+                <p>Educação Descentralizada (Learn-to-Earn)</p>
+            </div>
+            <button class="btn-connect" id="connectBtn">Conectar MetaMask</button>
+        </header>
+
+        <!-- Message -->
+        <div class="message" id="message"></div>
+
+        <!-- Balance Card -->
+        <div class="grid">
+            <div class="card balance-card" id="balanceCard" style="display: none;">
+                <h2>💰 Seu Saldo</h2>
+                <div class="balance-amount" id="balanceAmount">Carregando...</div>
+                <p>EduTokens disponíveis para operações</p>
+                <div class="network-info" id="networkInfo"></div>
+            </div>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="grid">
+            <!-- Mint NFT -->
+            <div class="card">
+                <h2>🎁 Emitir Certificado NFT</h2>
+                <p>Receba um certificado imutável de conclusão do curso.</p>
+                <button class="btn btn-primary" id="mintBtn" disabled>Emitir NFT</button>
+            </div>
+
+            <!-- Staking -->
+            <div class="card">
+                <h2>💎 Fazer Staking</h2>
+                <p>Trave seus tokens para ganhar recompensas.</p>
+                <input type="number" id="stakeAmount" placeholder="Quantidade de EDU" disabled>
+                <button class="btn btn-secondary" id="stakeBtn" disabled>Fazer Stake</button>
+            </div>
+
+            <!-- DAO Voting -->
+            <div class="card">
+                <h2>🗳️ Votação na DAO</h2>
+                <p>Participe da governança do protocolo.</p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="proposalSelect" style="font-size: 12px; color: #666; display: block; margin-bottom: 5px;">Selecione a Proposta:</label>
+                    <select id="proposalSelect" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-size: 14px;" disabled>
+                        <option value="0">#0: Adicionar Curso de DeFi</option>
+                        <option value="1">#1: Reduzir Taxa de Staking</option>
+                        <option value="2">#2: Parceria com Nova Escola</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-tertiary" id="voteBtn" disabled>Votar Agora</button>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <h3>📖 Sobre o Protocolo</h3>
+            <p><strong>EduToken (EDU):</strong> Moeda de recompensa para alunos que completam cursos e participam da governança.</p>
+            <p><strong>Certificados NFT:</strong> Diplomas imutáveis emitidos na blockchain como prova de conclusão.</p>
+            <p><strong>Staking:</strong> Trave seus tokens para ganhar recompensas adicionais ao longo do tempo.</p>
+            <p><strong>DAO:</strong> Comunidade vota em quais novos cursos devem ser adicionados à plataforma.</p>
+            <p style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 12px;">
+                <strong>Endereços dos Contratos (Sepolia):</strong><br>
+                Token: 0x2016ee7489541f6536e2C72230D02282C0DA2B84<br>
+                NFT: 0x6a207B07a63737498DdDB32120bE72B2F857b285<br>
+                Staking: 0x562Be5344D53E844B1fE3C8dbD7FB60fA9134e98<br>
+                DAO: 0xD070c2ea278684045B7364133eEa2Df5fa0400Cc
+            </p>
+        </div>
+    </div>
+
+    <!-- Script Ethers.js v6 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.1/dist/ethers.umd.min.js"></script>
+    <!-- App Logic -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
